@@ -7,6 +7,7 @@ from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras.metrics import categorical_accuracy
 from keras import backend as K
 from keras import losses
+from tensorflow import keras
 
 def model(input_shape=(64,64,3), classes=3, kernel_size = 3, filter_depth = (64,128,256,512,0)):
     
@@ -110,6 +111,6 @@ def model(input_shape=(64,64,3), classes=3, kernel_size = 3, filter_depth = (64,
     reshape15 = Reshape((input_shape[0]*input_shape[1],classes))(conv15)
     act15 = Activation("softmax")(reshape15)
     
-    model = Model(img_input, act15)
+    model = keras.Model(img_input, act15)
 
     return model
