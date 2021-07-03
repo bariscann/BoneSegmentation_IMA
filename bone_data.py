@@ -1,4 +1,5 @@
 import os
+from cv2 import data
 import numpy as np
 import cv2
 
@@ -76,17 +77,23 @@ class BoneData:
             images_data[image_folder] = self.__load_image(image_path=file_path)
             # if images_data[image_folder] is None:
             #     print(file_path)
-        return self.__dict_to_list(images_data)
+        data = self.__dict_to_list(images_data)
+        shape = (data.shape[0], ) + BoneData.SHAPE + (3,)
+        return data.reshape(shape)
         
     
     def __load_labels(self):
+        
         image_label_data = {}
         for image_folder in self.all_label_files:
             image_label_data[image_folder] = None
             for  class_folder in self.all_label_files[image_folder]:
                 for file_path in self.all_label_files[image_folder][class_folder]:
                     image_label_data[image_folder] = self.__merge_label(image_label_data[image_folder], np.load(file_path))
-        return self.__dict_to_list(image_label_data)
+        # data = np.expand_dims(self.__dict_to_list(image_label_data), 2)
+        data = self.__dict_to_list(image_label_data)
+        shape = (data.shape[0], ) + BoneData.SHAPE + (1,)
+        return data.reshape(shape)
     
     
     def __dict_to_list(self, data_asdict):
@@ -96,7 +103,7 @@ class BoneData:
             data = data_asdict[str(i)]
             data = self.__reshape(data=data)
             data_aslist.append(data)
-        return data_aslist
+        return np.array(data_aslist)
             
     def __reshape(self, data):
         try:
@@ -105,13 +112,31 @@ class BoneData:
         except Exception as e:
             print(e)
             return data
-        
+    
+    def generate_data(self):
+        return self.images_data, self.labels_data
     
     def __init__(self) -> None:
         self.all_label_files = self.__collect_all_label_files()
-        self.images_label_data = self.__load_labels()
+        self.labels_data = self.__load_labels()
         
         self.all_data_files = self.__collect_all_image_files()
         self.images_data = self.__load_images()
         
-# bone_data = BoneData()
+        self.data = self.generate_data()
+        
+bone_data = BoneData()
+# from keras_model import get_model
+# import tensorflow as tf
+# from tensorflow import keras
+# img_size = (200, 200)
+# num_classes = 2
+# with tf.device("cpu"):
+#     # Free up RAM in case the model definition cells were run multiple times
+#     keras.backend.clear_session()
+#     model = get_model(img_size, num_classes)
+    
+# model.compile(optimizer="rmsprop", loss="sparse_categorical_crossentropy")
+# # Train the model, doing validation at the end of each epoch.
+# epochs = 2
+# model.fit(bone_data.data, validation_data=bone_data.data, epochs=epochs)
