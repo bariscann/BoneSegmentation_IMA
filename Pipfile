@@ -10,6 +10,8 @@ jupyter = "*"
 tensorflow = "*"
 opencv-python-headless = "*"
 opencv-python = "*"
+scikit-learn = "*"
+scipy = "*"
 
 [dev-packages]
 

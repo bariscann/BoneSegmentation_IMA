@@ -1,8 +1,9 @@
 import os
+import numpy as np
 
 class BoneData:
     SHAPE = (200, 200)
-    # DATA_PATH = "/content/drive/MyDrive/New_masks"
+    # DATA_PATH = "/content/drive/MyDrive"
     DATA_PATH = "data"
     MASK_PATH = "{}/New_masks".format(DATA_PATH)
     IMAGE_PATH = "{}/New_Labels".format(DATA_PATH)
@@ -52,7 +53,7 @@ class BoneData:
         for i in range(1, num_image+1):
             data = data_asdict[str(i)]
             data_aslist.append(data)
-        return data_aslist
+        return np.array(data_aslist)
     
     def __init__(self) -> None:
         self.all_label_files = self.__collect_all_label_files()      

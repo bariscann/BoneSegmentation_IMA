@@ -66,5 +66,6 @@ class BoneDataset(keras.utils.Sequence):
             img = load_label(path_list=path_list)
             img = reshape(data=img, shape=self.img_size)
             y[j] = np.expand_dims(img, 2)
-
+        y = y.astype(np.float32)
+        print("DIKKKAT: ", y.dtype)
         return x, y
