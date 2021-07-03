@@ -51,7 +51,7 @@ class BoneData:
                     if not file_name.endswith(".json"):
                         filepath = "{}/{}".format(sub_folderpath, file_name)
                         all_files[sub_folder] = filepath
-        return all_files
+        return self.__dict_to_list(all_files)
     
     def __load_labels(self):
         image_label_data = {}
@@ -60,7 +60,19 @@ class BoneData:
             for  class_folder in self.all_label_files[image_folder]:
                 for file_path in self.all_label_files[image_folder][class_folder]:
                     image_label_data[image_folder] = self.__merge_label(image_label_data[image_folder], np.load(file_path))
-        return image_label_data
+        return self.__dict_to_list(image_label_data)
+    
+    
+    @staticmethod
+    def __dict_to_list(data_asdict):
+        num_image = len(data_asdict.keys())
+        data_aslist = []
+        for i in range(1, num_image+1):
+            data_aslist.append(data_asdict[str(i)])
+        return data_aslist
+            
+            
+        
     
     def __init__(self) -> None:
         self.all_label_files = self.__collect_all_label_files()
