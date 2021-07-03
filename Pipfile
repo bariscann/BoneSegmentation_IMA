@@ -8,6 +8,8 @@ numpy = "*"
 pillow = "*"
 jupyter = "*"
 tensorflow = "*"
+opencv-python-headless = "*"
+opencv-python = "*"
 
 [dev-packages]
 

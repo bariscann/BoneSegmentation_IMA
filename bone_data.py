@@ -1,8 +1,9 @@
 import os
 import numpy as np
+import cv2
 
 class BoneData:
-    
+    SHAPE = (200, 200)
     # DATA_PATH = "/content/drive/MyDrive/New_masks"
     DATA_PATH = "data"
     MASK_PATH = "{}/New_masks".format(DATA_PATH)
@@ -48,10 +49,35 @@ class BoneData:
                 file_names = os.listdir(sub_folderpath)
                 
                 for file_name in file_names:
-                    if not file_name.endswith(".json"):
+                    if (file_name.endswith(".jpg") 
+                        or file_name.endswith(".png") 
+                        or file_name.endswith(".PNG") 
+                        or file_name.endswith(".jpeg")
+                        or file_name.endswith(".JPG")
+                        or file_name.endswith(".JPEG")
+                        or file_name.endswith(".gif")):
                         filepath = "{}/{}".format(sub_folderpath, file_name)
                         all_files[sub_folder] = filepath
-        return self.__dict_to_list(all_files)
+        return all_files
+    
+    @staticmethod
+    def __load_image(image_path):
+        if image_path.endswith(".gif"):
+            cap = cv2.VideoCapture(image_path)
+            ret, data = cap.read()
+        else:
+            data = cv2.imread(image_path)
+        return data
+    
+    def __load_images(self):
+        images_data = {}
+        for image_folder in self.all_data_files:
+            file_path = self.all_data_files[image_folder]
+            images_data[image_folder] = self.__load_image(image_path=file_path)
+            # if images_data[image_folder] is None:
+            #     print(file_path)
+        return self.__dict_to_list(images_data)
+        
     
     def __load_labels(self):
         image_label_data = {}
@@ -63,21 +89,29 @@ class BoneData:
         return self.__dict_to_list(image_label_data)
     
     
-    @staticmethod
-    def __dict_to_list(data_asdict):
+    def __dict_to_list(self, data_asdict):
         num_image = len(data_asdict.keys())
         data_aslist = []
         for i in range(1, num_image+1):
-            data_aslist.append(data_asdict[str(i)])
+            data = data_asdict[str(i)]
+            data = self.__reshape(data=data)
+            data_aslist.append(data)
         return data_aslist
             
-            
+    def __reshape(self, data):
+        try:
+            r_data = cv2.resize(data, self.SHAPE)
+            return r_data
+        except Exception as e:
+            print(e)
+            return data
         
     
     def __init__(self) -> None:
         self.all_label_files = self.__collect_all_label_files()
-        self.image_label_data = self.__load_labels()
-        self.image_data = self.__collect_all_image_files()
-            
-    
-    
+        self.images_label_data = self.__load_labels()
+        
+        self.all_data_files = self.__collect_all_image_files()
+        self.images_data = self.__load_images()
+        
+# bone_data = BoneData()
