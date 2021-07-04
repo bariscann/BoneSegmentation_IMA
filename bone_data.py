@@ -1,18 +1,19 @@
 import os
+from keras.initializers import LOCAL
 import numpy as np
 
 class BoneData:
-    SHAPE = (200, 200)
-    # DATA_PATH = "/content/drive/MyDrive"
-    DATA_PATH = "data"
-    MASK_PATH = "{}/New_masks".format(DATA_PATH)
-    IMAGE_PATH = "{}/New_Labels".format(DATA_PATH)
-
+    # SHAPE = (200, 200)
+    COLAB = 0
+    LOCAL_PC = 1
+    DATA_PATHS = ["/content/drive/MyDrive",
+                  "data"]
+    
     def __collect_all_label_files(self):
-        sub_folders = os.listdir(self.MASK_PATH)
+        sub_folders = os.listdir(self.mask_path)
         all_files = {}
         for sub_folder in sub_folders:
-            sub_folderpath = "{}/{}".format(self.MASK_PATH, sub_folder)
+            sub_folderpath = "{}/{}".format(self.mask_path, sub_folder)
             # print(sub_folderpath)
             class_folders = os.listdir(sub_folderpath)
             if sub_folder not in all_files:
@@ -28,10 +29,10 @@ class BoneData:
         return self.__dict_to_list(all_files)
     
     def __collect_all_image_files(self):
-        sub_folders = os.listdir(self.IMAGE_PATH)
+        sub_folders = os.listdir(self.image_path)
         all_files = {}
         for sub_folder in sub_folders:
-            sub_folderpath = "{}/{}".format(self.IMAGE_PATH, sub_folder)
+            sub_folderpath = "{}/{}".format(self.image_path, sub_folder)
             if os.path.isdir(sub_folderpath):
                 file_names = os.listdir(sub_folderpath)
                 
@@ -55,6 +56,8 @@ class BoneData:
             data_aslist.append(data)
         return np.array(data_aslist)
     
-    def __init__(self) -> None:
+    def __init__(self, work_area=LOCAL_PC) -> None:
+        self.mask_path = "{}/New_masks".format(self.DATA_PATHS[work_area])
+        self.image_path = "{}/New_Labels".format(self.DATA_PATHS[work_area])
         self.all_label_files = self.__collect_all_label_files()      
         self.all_data_files = self.__collect_all_image_files()
