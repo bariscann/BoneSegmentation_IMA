@@ -1,5 +1,5 @@
 from keras.models import Model
-from keras.layers import Input, Concatenate, Conv2D, MaxPooling2D, UpSampling2D, Dropout, Cropping2D
+from keras.layers import Input, Concatenate, Conv2D, MaxPooling2D, UpSampling2D, Dropout, Cropping2D, Lambda
 from keras.layers import BatchNormalization, Reshape, Layer
 from keras.layers import Activation, Flatten, Dense
 from keras.optimizers import *
@@ -12,9 +12,10 @@ from tensorflow import keras
 def model(input_shape=(64,64,3), classes=3, kernel_size = 3, filter_depth = (64,128,256,512,0)):
     
     img_input = Input(shape=input_shape)
+    s = Lambda(lambda x: x / 255) (img_input)
     
     # Encoder
-    conv1 = Conv2D(filter_depth[0], (kernel_size, kernel_size), padding="same")(img_input)
+    conv1 = Conv2D(filter_depth[0], (kernel_size, kernel_size), padding="same")(s)
     batch1 = BatchNormalization()(conv1)
     act1 = Activation("relu")(batch1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(act1)
@@ -109,7 +110,7 @@ def model(input_shape=(64,64,3), classes=3, kernel_size = 3, filter_depth = (64,
     
     
     reshape15 = Reshape((input_shape[0]*input_shape[1],classes))(conv15)
-    act15 = Activation("softmax")(reshape15)
+    act15 = Activation("sigmoid")(reshape15)
     
     model = keras.Model(img_input, act15)
 
