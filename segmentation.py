@@ -16,7 +16,7 @@ def get_callbacks(fold_no=0):
     callbacks = [keras.callbacks.ModelCheckpoint(f"bone_segmentation{fold_no}.h5", save_best_only=True)]
 
 
-def kfold_xnet_test(img_size, all_gen, bone_data, batch_size=8, epochs=2, num_folds=5):
+def kfold_xnet_test(img_size, all_gen, bone_data, batch_size=8, epochs=2, num_folds=5, is_callbacks_enable=False):
     num_folds = 5
     # Define the K-fold Cross Validator
     kfold = KFold(n_splits=num_folds, shuffle=True)
@@ -44,8 +44,10 @@ def kfold_xnet_test(img_size, all_gen, bone_data, batch_size=8, epochs=2, num_fo
         print('------------------------------------------------------------------------')
         print(f'Training for fold {fold_no} ...')
         
-        
-        history = xnet_model.fit(train_gen, epochs=epochs, batch_size=batch_size, callbacks=get_callbacks(fold_no=fold_no))
+        if is_callbacks_enable:
+            history = xnet_model.fit(train_gen, epochs=epochs, batch_size=batch_size, callbacks=get_callbacks(fold_no=fold_no))
+        else:
+            history = xnet_model.fit(train_gen, epochs=epochs, batch_size=batch_size)
         scores = xnet_model.evaluate(test_gen)
         message = f"Score for fold {fold_no}: "
         for metric_name, metric_score in zip(xnet_model.metrics_names, scores):

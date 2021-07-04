@@ -22,4 +22,5 @@ all_gen = BoneDataset(batch_size=1,
 metric_names_list, scores_list = kfold_xnet_test(img_size=img_size, 
                                                     all_gen=all_gen,
                                                     bone_data=bone_data,
+                                                    batch_size=4,
                                                     epochs=100)
