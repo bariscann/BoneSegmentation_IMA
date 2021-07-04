@@ -1,4 +1,5 @@
 
+from tensorflow.keras import callbacks
 from bone_dataset import BoneDataset
 from xnet import model as XnetModel
 
@@ -9,6 +10,10 @@ from tensorflow.keras.optimizers import Adam
 
 from dice import dice_coef, dice_coef_loss
 from hausdorf import weighted_hausdorff_distance
+
+
+def get_callbacks(fold_no=0):
+    callbacks = [keras.callbacks.ModelCheckpoint(f"bone_segmentation{fold_no}.h5", save_best_only=True)]
 
 
 def kfold_xnet_test(img_size, all_gen, bone_data, batch_size=8, epochs=2, num_folds=5):
@@ -40,7 +45,7 @@ def kfold_xnet_test(img_size, all_gen, bone_data, batch_size=8, epochs=2, num_fo
         print(f'Training for fold {fold_no} ...')
         
         
-        history = xnet_model.fit(train_gen, epochs=epochs, batch_size=batch_size)
+        history = xnet_model.fit(train_gen, epochs=epochs, batch_size=batch_size, callbacks=get_callbacks(fold_no=fold_no))
         scores = xnet_model.evaluate(test_gen)
         message = f"Score for fold {fold_no}: "
         for metric_name, metric_score in zip(xnet_model.metrics_names, scores):
